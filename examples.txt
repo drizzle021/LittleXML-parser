@@ -1,0 +1,14 @@
+<a/> - xmldokument -> element -> emptyelemtag -> <name/> -> <namestart nameend/> -> <letter nameend/> -> <letter nameend/> -> <a nameend/> -> <a/>
+
+<?xmlversion=1.0?><a/> - xmldokument -> xmldecl element -> <?xml version= vernumb?> element -> <?xml version= number.number?> element -> 
+    |-> <?xml version= digit.number?> element -> <?xml version= 1.number?> element -> <?xml version= 1.digit?> element -> <?xml version= 1.0?> element ->
+    |-> <?xml version= 1.0?> emptyelemtag -> <?xml version= 1.0?> <name/> -> <?xml version= 1.0?> <namestart nameend/> -> <?xml version= 1.0?> <letter nameend/> ->
+    |-> <?xml version= 1.0?><letter nameend/> -> <?xml version= 1.0?><a nameend/> -> <?xml version= 1.0?><a/>
+
+<a>Hello123</a>
+
+<a><b/><c/></a> (incorrect, only one emptyelemtag allowed)
+
+<a>Hello<b/>World</a> (incorrect, cant nest emptyelemtag between words)
+
+<?xml version=12.3?><ab:><ef:>N@C#</ab:></ab:>
