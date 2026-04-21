@@ -1,10 +1,10 @@
 from load_parse_table import load_parse_table
 from rules import rules
-from pprint import pprint
 from parser import parse
 from tree import build_parse_tree, print_tree
+from lexer import tokenize
 
-PARSE_TABLE = load_parse_table(path="table1.csv")
+PARSE_TABLE = load_parse_table(path="table.csv")
 GRAMMAR_RULES = rules
 
 pprint (PARSE_TABLE)
@@ -12,14 +12,20 @@ pprint (PARSE_TABLE)
 # <a><b/><c/></a> 
 # <a>Hello<b/>World</a>
 # <?xml version=12.3?></a>
-tokens = ["<?xml", "version=", "NUMBER", ".", "NUMBER", "?>", 
-          "<", "IDENT",":", ">","<", "IDENT",":", ">", "IDENT", "@","IDENT","#","</","IDENT",":",">","</","IDENT",":",">",
-          "$"]
+# tokens = ["<?xml", "version=", "NUMBER", ".", "NUMBER", "?>", 
+#           "<", "IDENT",":", ">","<", "IDENT",":", ">", "IDENT", "@","IDENT","#","</","IDENT",":",">","</","IDENT",":",">",
+#           "$"]
 # tokens = ["<","IDENT",">","<","IDENT","/>","<","IDENT","/>","</","IDENT",">","$"]
 # tokens = ["<","IDENT",">","IDENT","<","IDENT","/>","IDENT","</","IDENT",">", "$"]
-tokens = ["<?xml", "version=", "NUMBER", ".", "NUMBER", "?>", 
-          "<","IDENT","/>",
-          "$"]
+# tokens = ["<?xml", "version=", "NUMBER", ".", "NUMBER", "?>", 
+#           "<","IDENT","/>",
+#           "$"]
+
+xml = '<?xml version=12.3?><ab:><ef:>N@C#</ab:></ab:>'
+tokens = tokenize(xml)
+print(f"Input:  {xml}")
+print(f"Tokens: {tokens}\n")
+
 success, rule_seq = parse(tokens, PARSE_TABLE, GRAMMAR_RULES, "xmldokument")
 print(f"Success: {success}, Rule sequence: {rule_seq}")
 
