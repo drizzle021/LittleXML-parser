@@ -23,7 +23,7 @@ rules = {
     22: ("namechar",    ["-"]),
     23: ("namechar",    ["_"]),
     24: ("namechar",    [":"]),
-    25: ("letter",      ["IDENT"]),
+    25: ("letter",      ["LETTER"]),
     26: ("number",      ["digit", "number′"]),
     27: ("number′",     ["number"]),
     28: ("number′",     []),

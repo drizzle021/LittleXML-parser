@@ -1,6 +1,8 @@
+from token_ import Token
+
 SINGLE_CHAR_TOKENS = set('<>.-:_!@#')
 
-
+# TODO: implement error recovery
 def tokenize(text):
     '''
     Converts a raw LittleXML string into a token sequence for the parser.
@@ -18,50 +20,50 @@ def tokenize(text):
 
         # Multi-character tokens — longest match first
         if text[i:i+5] == '<?xml':
-            tokens.append('<?xml')
+            tokens.append(Token('<?xml', '<?xml'))
             i += 5
             continue
 
         if text[i:i+8] == 'version=':
-            tokens.append('version=')
+            tokens.append(Token('version=', 'version='))
             i += 8
             continue
 
         if text[i:i+2] == '?>':
-            tokens.append('?>')
+            tokens.append(Token('?>', '?>'))
             i += 2
             continue
 
         if text[i:i+2] == '</':
-            tokens.append('</')
+            tokens.append(Token('</', '</'))
             i += 2
             continue
 
         if text[i:i+2] == '/>':
-            tokens.append('/>')
+            tokens.append(Token('/>', '/>'))
             i += 2
             continue
 
         c = text[i]
 
         if c.isalpha():
-            tokens.append('IDENT')
+            tokens.append(Token('LETTER', c))
             i += 1
             continue
 
         if c.isdigit():
-            tokens.append('NUMBER')
+            tokens.append(Token('NUMBER', c))
             i += 1
             continue
 
         if c in SINGLE_CHAR_TOKENS:
-            tokens.append(c)
+            tokens.append(Token(c, c))
             i += 1
             continue
 
         raise ValueError(f"Unexpected character '{c}' at position {i}")
 
-    tokens.append('$')
+    tokens.append(Token('$', '$'))
     return tokens
 
 
