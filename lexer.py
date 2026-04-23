@@ -1,12 +1,48 @@
 from token_ import Token
+from colors import bcolors
 
-SINGLE_CHAR_TOKENS = set('<>.-:_!@#')
+# DFA transition table: TRANSITIONS[state][char] = next_state
+TRANSITIONS = {
+    'START':   {'<': 'LT', '?': 'Q', '/': 'SL', 'v': 'V'},
+    'LT':      {'?': 'LT_Q', '/': 'LT_SL'},
+    'LT_Q':    {'x': 'LT_QX'},
+    'LT_QX':   {'m': 'LT_QXM'},
+    'LT_QXM':  {'l': 'LT_QXML'},
+    'Q':       {'>': 'Q_GT'},
+    'SL':      {'>': 'SL_GT'},
+    'V':       {'e': 'VE'},
+    'VE':      {'r': 'VER'},
+    'VER':     {'s': 'VERS'},
+    'VERS':    {'i': 'VERSI'},
+    'VERSI':   {'o': 'VERSIO'},
+    'VERSIO':  {'n': 'VERSION'},
+    'VERSION': {'=': 'VERSION_EQ'},
+}
 
-# TODO: implement error recovery
+# Accepting states and their token types
+ACCEPT = {
+    'LT': '<', 'LT_SL': '</', 'LT_QXML': '<?xml',
+    'Q_GT': '?>', 'SL_GT': '/>',
+    '>': '>', '.': '.', '-': '-', ':': ':', '_': '_',
+    '!': '!', '@': '@', '#': '#',
+    'LETTER': 'LETTER', 'NUMBER': 'NUMBER',
+    'V': 'LETTER', 'VERSION_EQ': 'version=',
+}
+
+def _next(state, c):
+    t = TRANSITIONS.get(state, {}).get(c)
+    if t:
+        return t
+    if state == 'START':
+        if c in '>.-:_!@#': return c
+        if c.isalpha(): return 'LETTER'
+        if c.isdigit(): return 'NUMBER'
+    return None
+
 def tokenize(text):
     '''
     Converts a raw LittleXML string into a token sequence for the parser.
-    Each letter -> IDENT, each digit -> NUMBER, whitespace is skipped.
+    Implements a DFA with maximal munch and error recovery by skipping invalid characters.
     Returns a list ending with the EOF sentinel '$'.
     '''
     tokens = []
@@ -18,50 +54,30 @@ def tokenize(text):
             i += 1
             continue
 
-        # Multi-character tokens — longest match first
-        if text[i:i+5] == '<?xml':
-            tokens.append(Token('<?xml', '<?xml'))
-            i += 5
-            continue
+        # Maximal munch: advance until no transition, emit last accepted token
+        state = 'START'
+        last_accept = None
+        last_pos = i
+        j = i
+        while j < n:
+            ns = _next(state, text[j])
+            if ns is None:
+                break
+            state = ns
+            j += 1
+            if state in ACCEPT:
+                last_accept = state
+                last_pos = j
 
-        if text[i:i+8] == 'version=':
-            tokens.append(Token('version=', 'version='))
-            i += 8
-            continue
-
-        if text[i:i+2] == '?>':
-            tokens.append(Token('?>', '?>'))
-            i += 2
-            continue
-
-        if text[i:i+2] == '</':
-            tokens.append(Token('</', '</'))
-            i += 2
-            continue
-
-        if text[i:i+2] == '/>':
-            tokens.append(Token('/>', '/>'))
-            i += 2
-            continue
-
-        c = text[i]
-
-        if c.isalpha():
-            tokens.append(Token('LETTER', c))
+        if last_accept is None:
+            print(f"{bcolors.FAIL}LEX ERROR: unexpected '{text[i]}' at position {i}, skipping.{bcolors.ENDC}")
             i += 1
             continue
 
-        if c.isdigit():
-            tokens.append(Token('NUMBER', c))
-            i += 1
-            continue
-
-        if c in SINGLE_CHAR_TOKENS:
-            tokens.append(Token(c, c))
-            i += 1
-            continue
-
-        raise ValueError(f"Unexpected character '{c}' at position {i}")
+        token = Token(ACCEPT[last_accept], text[i:last_pos])
+        print(f"{bcolors.OKCYAN}Token: {token}{bcolors.ENDC}")
+        tokens.append(token)
+        i = last_pos
 
     tokens.append(Token('$', '$'))
     return tokens
