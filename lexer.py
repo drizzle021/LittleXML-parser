@@ -73,8 +73,10 @@ def tokenize(text):
             print(f"{bcolors.FAIL}LEX ERROR: unexpected '{text[i]}' at position {i}, skipping.{bcolors.ENDC}")
             i += 1
             continue
-
-        token = Token(ACCEPT[last_accept], text[i:last_pos])
+            
+        #token = Token(ACCEPT[last_accept], text[i:last_pos])
+        # TODO : change rules and table.csv to use the token types instead of the raw symbols
+        token = Token(last_accept, text[i:last_pos]) # changed to show token instead of symbol
         print(f"{bcolors.OKCYAN}Token: {token}{bcolors.ENDC}")
         tokens.append(token)
         i = last_pos
