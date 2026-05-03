@@ -46,6 +46,7 @@ def tokenize(text):
     Returns a list ending with the EOF sentinel '$'.
     '''
     tokens = []
+    errors = 0
     i = 0
     n = len(text)
 
@@ -60,7 +61,12 @@ def tokenize(text):
         last_pos = i
         j = i
         while j < n:
-            ns = _next(state, text[j])
+            c = text[j]
+            ns = _next(state, c)
+            if ns in ACCEPT:
+                print(f"  {bcolors.OKCYAN}State: {state}, Char: '{c}', Next: {ns} (accept: {ACCEPT[ns]}){bcolors.ENDC}")
+            else:
+                print(f"  State: {state}, Char: '{c}', Next: {ns or '-'}")
             if ns is None:
                 break
             state = ns
@@ -71,28 +77,18 @@ def tokenize(text):
 
         if last_accept is None:
             print(f"{bcolors.FAIL}LEX ERROR: unexpected '{text[i]}' at position {i}, skipping.{bcolors.ENDC}")
+            errors += 1
             i += 1
             continue
             
-        #token = Token(ACCEPT[last_accept], text[i:last_pos])
-        # TODO : change rules and table.csv to use the token types instead of the raw symbols
-        token = Token(last_accept, text[i:last_pos]) # changed to show token instead of symbol
+        token = Token(ACCEPT[last_accept], text[i:last_pos])
         print(f"{bcolors.OKCYAN}Token: {token}{bcolors.ENDC}")
         tokens.append(token)
         i = last_pos
 
     tokens.append(Token('$', '$'))
+    if errors:
+        print(f"{bcolors.WARNING}Tokenization complete with {errors} error(s): {len(tokens) - 1} token(s).{bcolors.ENDC}")
+    else:
+        print(f"{bcolors.OKGREEN}Tokenization complete: {len(tokens) - 1} token(s).{bcolors.ENDC}")
     return tokens
-
-
-if __name__ == '__main__':
-    examples = [
-        '<a/>',
-        '<?xml version=1.0?><a/>',
-        '<?xml version=12.3?><ab:><ef:>N@C#</ab:></ab:>',
-        '<a>Hello123</a>',
-    ]
-    for ex in examples:
-        print(f"Input:  {ex}")
-        print(f"Tokens: {tokenize(ex)}")
-        print()

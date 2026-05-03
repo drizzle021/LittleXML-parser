@@ -11,6 +11,7 @@ GRAMMAR_RULES = rules
 START_SYMBOL = "xmldokument"
 EOF = "$"
 SRC = examples.src
+# SRC = examples.recovery_test_src
 TOKENS = tokenize(SRC)
 
 print(f"Input:  {SRC}")
