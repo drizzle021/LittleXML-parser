@@ -1,7 +1,7 @@
 from load_parse_table import load_parse_table
 from rules import rules
 from parser import parse
-from tree import build_parse_tree, print_tree, visualize_tree
+from tree import print_tree, visualize_tree
 from lexer import tokenize
 import sys
 import examples
@@ -11,13 +11,17 @@ GRAMMAR_RULES = rules
 START_SYMBOL = "xmldokument"
 EOF = "$"
 SRC = examples.src
-# SRC = examples.recovery_test_src
+#SRC = examples.src_2
+SRC = examples.src_long
+#SRC = examples.invalid_src
+#SRC = examples.invalid_src_2
+#SRC = examples.recovery_test_src
 TOKENS = tokenize(SRC)
 
 print(f"Input:  {SRC}")
 print(f"Tokens: {TOKENS}\n")
 
-success, rule_seq = parse(
+success, rule_seq, tree = parse(
     TOKENS, 
     PARSE_TABLE, 
     GRAMMAR_RULES, 
@@ -33,7 +37,7 @@ print(f"Success: {success}, Rule sequence: {rule_seq}")
 if not success:
     print("Parsing failed. No parse tree generated.")
     sys.exit(1)
-
+ 
 nonterminals = set(PARSE_TABLE.keys())
 
 lhs_of = {}
@@ -43,6 +47,5 @@ for nt, row in PARSE_TABLE.items():
 
 
 print("Parse tree:")
-tree = build_parse_tree(rule_seq[::-1], GRAMMAR_RULES, nonterminals)
 print_tree(tree)
 visualize_tree(tree)

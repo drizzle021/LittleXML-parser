@@ -120,6 +120,7 @@ recovery_test_tokens = [
 
 src = '<?xml version=12.3?><ab:><ef:>N@C#</ab:></ab:>'
 src_2 = '<?xml version=12.3?><a/>'
+src_long = '<?xml version=12.3?><a><b><c><d><e><f>TextText</d></c></e:></f:></f:></e:>'
 invalid_src = '<a><b/><c/></a>'
 invalid_src_2 = '<a>Hello<b/>World</a>'
 recovery_test_src = '<a>Hello&</a>'
