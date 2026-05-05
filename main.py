@@ -27,7 +27,7 @@ success, rule_seq, tree = parse(
     GRAMMAR_RULES, 
     START_SYMBOL, 
     EOF=EOF,
-    sync={"<",">","/>","</","$"},
+    sync={">","/>","</","$"},
     recovery=True
 )
 print(f"Success: {success}, Rule sequence: {rule_seq}")
